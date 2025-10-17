@@ -10,7 +10,7 @@
 
 ---
 
-## 📘 Abstract
+##  Abstract
 
 This project proposes the redesign of the university’s Learning Management System (LMS) infrastructure into a **unified, cloud-native distributed system**.  
 Currently, multiple isolated Moodle instances (Academics, Finance, HR) cause **data silos**, operational inefficiencies, and manual data transfers.  
@@ -27,7 +27,7 @@ Currently, multiple isolated Moodle instances (Academics, Finance, HR) cause **d
 
 ---
 
-## 🧭 Table of Contents
+##  Table of Contents
 
 1. [Introduction & Problem Statement](#introduction--problem-statement)
 2. [Project Scope](#project-scope)
@@ -41,7 +41,7 @@ Currently, multiple isolated Moodle instances (Academics, Finance, HR) cause **d
 
 ---
 
-## 1️⃣ Introduction & Problem Statement
+## 1️ Introduction & Problem Statement
 
 Universities face digital fragmentation due to isolated systems for Academics, Finance, and HR.  
 Manual data exchange leads to inefficiencies, data loss, and poor user experience.
@@ -179,7 +179,7 @@ A **distributed microservices architecture** will provide scalability, fault tol
 
 ---
 
-## 🏁 Conclusion
+##  Conclusion
 
 The proposed **Unified Cloud-Based Distributed System** eliminates Moodle data silos and manual data handling inefficiencies.  
 By leveraging **microservices**, **event-driven communication**, and **cloud-native deployment**, this project transforms university operations — increasing agility, efficiency, and decision-making capability.
