@@ -1,4 +1,4 @@
-# A Unified, Cloud-Based Distributed System for University Management
+# ICTNexus , A Microservice Based University Management System
 
 **Course:** CS 4122 – Distributed Systems and Cloud Computing  
 **Faculty:** ICT Faculty  
