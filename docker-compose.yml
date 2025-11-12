@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  auth-service:
+    build: ./auth-service
+    container_name: auth_service
+    ports:
+      - "5000:5000"
+    networks:
+      - ums-net
+
+  student-service:
+    build: ./student-service
+    container_name: student_service
+    ports:
+      - "5001:5000"
+    networks:
+      - ums-net
+  
+  student-db:
+    image: postgres:15
+    container_name: student_db
+    environment:
+      POSTGRES_USER: student_user
+      POSTGRES_PASSWORD: student_pass
+      POSTGRES_DB: student_db
+    ports:
+      - "5433:5432"
+    networks:
+      - ums-net
+
+  course-service:
+    build: ./course-service
+    container_name: course_service
+    ports:
+      - "5002:5000"
+    networks:
+      - ums-net
+
+  faculty-service:
+    build: ./faculty-service
+    container_name: faculty_service
+    ports:
+      - "5003:5000"
+    networks:
+      - ums-net
+
+  finance-service:
+    build: ./finance-service
+    container_name: finance_service
+    ports:
+      - "5004:5000"
+    networks:
+      - ums-net
+
+
+networks:
+  ums-net:
+    driver: bridge
