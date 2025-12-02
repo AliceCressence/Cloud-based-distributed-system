@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package storage;
+
+// Storage Node Service
+service StorageNodeService {
+    // Store a file chunk
+    rpc StoreChunk(StoreChunkRequest) returns (StoreChunkResponse);
+    
+    // Retrieve a file chunk
+    rpc RetrieveChunk(RetrieveChunkRequest) returns (RetrieveChunkResponse);
+    
+    // Delete a file chunk
+    rpc DeleteChunk(DeleteChunkRequest) returns (DeleteChunkResponse);
+    
+    // Get node health status
+    rpc GetHealth(HealthRequest) returns (HealthResponse);
+    
+    // List all chunks on this node
+    rpc ListChunks(ListChunksRequest) returns (ListChunksResponse);
+}
+
+// Store Chunk Messages
+message StoreChunkRequest {
+    string chunk_id = 1;
+    bytes data = 2;
+    string checksum = 3;
+    int32 chunk_index = 4;
+    string file_id = 5;
+}
+
+message StoreChunkResponse {
+    bool success = 1;
+    string message = 2;
+    string chunk_id = 3;
+    int64 bytes_written = 4;
+}
+
+// Retrieve Chunk Messages
+message RetrieveChunkRequest {
+    string chunk_id = 1;
+}
+
+message RetrieveChunkResponse {
+    bool success = 1;
+    string message = 2;
+    bytes data = 3;
+    string checksum = 4;
+}
+
+// Delete Chunk Messages
+message DeleteChunkRequest {
+    string chunk_id = 1;
+}
+
+message DeleteChunkResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Health Check Messages
+message HealthRequest {
+}
+
+message HealthResponse {
+    string status = 1;
+    int64 capacity_bytes = 2;
+    int64 used_bytes = 3;
+    int64 available_bytes = 4;
+    int32 chunk_count = 5;
+    double uptime_seconds = 6;
+}
+
+// List Chunks Messages
+message ListChunksRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+}
+
+message ChunkInfo {
+    string chunk_id = 1;
+    string file_id = 2;
+    int64 size_bytes = 3;
+    string checksum = 4;
+    int64 created_timestamp = 5;
+}
+
+message ListChunksResponse {
+    repeated ChunkInfo chunks = 1;
+    int32 total_count = 2;
+}
