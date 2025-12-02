@@ -396,3 +396,5 @@ class UserService(object):
             timeout,
             metadata,
             _registered_method=True)
+        def fname(arg):
+                pass
