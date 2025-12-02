@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './components/Toast';
 import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
@@ -29,7 +29,7 @@ function App() {
               path="/"
               element={
                 <PrivateRoute>
-                  <DashboardPage />
+                  <AdminDashboardPage />
                 </PrivateRoute>
               }
             />

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import init_db
-from .routers import auth, files, nodes, admin
+from .routers import auth, files, nodes, admin, email_verification
 from .config import get_settings
 
 settings = get_settings()
@@ -23,6 +23,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(email_verification.router, prefix="/api/v1")
 app.include_router(files.router, prefix="/api/v1")
 app.include_router(nodes.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
