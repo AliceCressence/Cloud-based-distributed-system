@@ -31,6 +31,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String, unique=True, index=True)  # From auth-service
     email = Column(String, unique=True, index=True)
+    password_hash = Column(String)  # Hashed password for standalone auth
     role = Column(SQLEnum(UserRole), default=UserRole.STUDENT_UNDERGRAD)
     storage_quota_bytes = Column(BigInteger)  # In bytes
     storage_used_bytes = Column(BigInteger, default=0)

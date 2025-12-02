@@ -44,6 +44,14 @@ class NodeService:
         return [NodeResponse.model_validate(n) for n in nodes]
     
     @staticmethod
+    def get_available_nodes(db: Session) -> List[NodeResponse]:
+        """Get available (online) storage nodes for file operations"""
+        nodes = db.query(StorageNode).filter(
+            StorageNode.status == NodeStatus.ONLINE
+        ).all()
+        return [NodeResponse.model_validate(n) for n in nodes]
+    
+    @staticmethod
     def get_node(db: Session, node_id: str) -> StorageNode:
         """Get a specific node"""
         node = db.query(StorageNode).filter(StorageNode.node_id == node_id).first()

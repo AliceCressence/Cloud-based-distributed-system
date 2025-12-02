@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional, List
 from .models import UserRole, FileStatus, NodeStatus
@@ -6,7 +6,7 @@ from .models import UserRole, FileStatus, NodeStatus
 
 # User Schemas
 class UserBase(BaseModel):
-    email: EmailStr
+    email: str
     role: UserRole = UserRole.STUDENT_UNDERGRAD
 
 

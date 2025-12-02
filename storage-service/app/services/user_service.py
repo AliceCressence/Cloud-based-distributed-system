@@ -30,9 +30,13 @@ class UserService:
         # Calculate quota based on role
         quota = calculate_quota_bytes(role)
         
+        # Hash password
+        hashed_password = get_password_hash(password)
+        
         user = User(
             user_id=user_id,
             email=email,
+            password_hash=hashed_password,
             role=role,
             storage_quota_bytes=quota,
             storage_used_bytes=0,

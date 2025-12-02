@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
-from ..auth import get_admin_user
+from ..auth import get_admin_user, get_current_user
 from ..models import User
 from ..schemas import (
     NodeCreate, NodeResponse, NodeHealthResponse,
@@ -39,12 +39,21 @@ def list_nodes(
     return NodeService.get_all_nodes(db)
 
 
+@router.get("/available", response_model=List[NodeResponse])
+def get_available_nodes(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get available online storage nodes for file upload (authenticated users)"""
+    return NodeService.get_available_nodes(db)
+
+
 @router.get("/health", response_model=List[NodeHealthResponse])
 async def check_all_nodes_health(
     current_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Check health of all storage nodes"""
+    """Check health of all storage nodes (admin only)"""
     return await NodeService.check_all_nodes_health(db)
 
 

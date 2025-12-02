@@ -1,0 +1,130 @@
+version: "3.9"
+
+services:
+  # PostgreSQL Database for Storage Service
+  storage-db:
+    image: postgres:15
+    container_name: storage_db
+    environment:
+      POSTGRES_USER: storage_user
+      POSTGRES_PASSWORD: storage_pass
+      POSTGRES_DB: ictnexus_storage
+    ports:
+      - "5434:5432"
+    volumes:
+      - storage_db_data:/var/lib/postgresql/data
+      - ./storage-service/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ums-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U storage_user -d ictnexus_storage"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Storage Service API
+  storage-service:
+    build: ./storage-service
+    container_name: storage_service
+    ports:
+      - "8085:8085"
+    environment:
+      DATABASE_URL: postgresql://storage_user:storage_pass@storage-db:5432/ictnexus_storage
+      SECRET_KEY: dev-secret-key-change-in-production
+      AUTH_SERVICE_URL: http://auth-service:5000
+      STUDENT_SERVICE_URL: http://student-service:5000
+      COURSE_SERVICE_URL: http://course-service:5000
+      STORAGE_NODES: storage-node-1:50051,storage-node-2:50052,storage-node-3:50053
+    depends_on:
+      storage-db:
+        condition: service_healthy
+    networks:
+      - ums-net
+    volumes:
+      - ./storage-service:/app
+
+  # Storage Node 1
+  storage-node-1:
+    build: ./storage-nodes
+    container_name: storage_node_1
+    ports:
+      - "50051:50051"
+    environment:
+      NODE_ID: node1
+      NODE_PORT: 50051
+      CAPACITY_GB: 5
+    command: ["python", "node.py", "--node-id", "node1", "--port", "50051", "--capacity-gb", "5"]
+    networks:
+      - ums-net
+    volumes:
+      - node1_vdisk:/app/vdisks
+
+  # Storage Node 2
+  storage-node-2:
+    build: ./storage-nodes
+    container_name: storage_node_2
+    ports:
+      - "50052:50052"
+    environment:
+      NODE_ID: node2
+      NODE_PORT: 50052
+      CAPACITY_GB: 5
+    command: ["python", "node.py", "--node-id", "node2", "--port", "50052", "--capacity-gb", "5"]
+    networks:
+      - ums-net
+    volumes:
+      - node2_vdisk:/app/vdisks
+
+  # Storage Node 3
+  storage-node-3:
+    build: ./storage-nodes
+    container_name: storage_node_3
+    ports:
+      - "50053:50053"
+    environment:
+      NODE_ID: node3
+      NODE_PORT: 50053
+      CAPACITY_GB: 5
+    command: ["python", "node.py", "--node-id", "node3", "--port", "50053", "--capacity-gb", "5"]
+    networks:
+      - ums-net
+    volumes:
+      - node3_vdisk:/app/vdisks
+
+  # Storage Client Portal (React)
+  storage-client-portal:
+    build: ./storage-client-portal
+    container_name: storage_client_portal
+    ports:
+      - "5175:5173"
+    environment:
+      VITE_API_URL: http://localhost:8085/api/v1
+    networks:
+      - ums-net
+    volumes:
+      - ./storage-client-portal:/app
+      - /app/node_modules
+
+  # Storage Admin Portal (React)
+  storage-admin-portal:
+    build: ./storage-admin-portal
+    container_name: storage_admin_portal
+    ports:
+      - "5176:5173"
+    environment:
+      VITE_API_URL: http://localhost:8085/api/v1
+    networks:
+      - ums-net
+    volumes:
+      - ./storage-admin-portal:/app
+      - /app/node_modules
+
+networks:
+  ums-net:
+    driver: bridge
+
+volumes:
+  storage_db_data:
+  node1_vdisk:
+  node2_vdisk:
+  node3_vdisk:
