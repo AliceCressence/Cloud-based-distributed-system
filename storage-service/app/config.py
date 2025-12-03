@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     # RabbitMQ
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
     
+    # Email/SMTP Configuration
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""  # Gmail App Password
+    smtp_from_email: str = "noreply@ictnexus.edu"
+    smtp_from_name: str = "ICTNexus Storage"
+    smtp_enabled: bool = False  # Set to True to enable email sending
+    
     class Config:
         env_file = ".env"
         case_sensitive = False

@@ -50,43 +50,48 @@ class EmailService:
     @staticmethod
     def send_otp_email(email: str, otp_code: str):
         """Send OTP code via email"""
-        # Email configuration (you'll need to set these in your environment)
         try:
             msg = MIMEMultipart()
-            msg['From'] = settings.smtp_from_email if hasattr(settings, 'smtp_from_email') else "noreply@ictnexus.edu"
+            msg['From'] = f"{settings.smtp_from_name} <{settings.smtp_from_email}>"
             msg['To'] = email
             msg['Subject'] = "ICTNexus Storage - Email Verification Code"
             
             body = f"""
-            Dear User,
-            
-            Welcome to ICTNexus Storage Service!
-            
-            Your email verification code is: {otp_code}
-            
-            This code will expire in 10 minutes.
-            
-            If you did not request this code, please ignore this email.
-            
-            Best regards,
-            ICTNexus Storage Team
-            """
+Dear User,
+
+Welcome to ICTNexus Storage Service!
+
+Your email verification code is: {otp_code}
+
+This code will expire in 10 minutes.
+
+If you did not request this code, please ignore this email.
+
+Best regards,
+ICTNexus Storage Team
+"""
             
             msg.attach(MIMEText(body, 'plain'))
             
-            # For development, just log the OTP instead of sending
-            # In production, configure SMTP settings
+            # Always log the OTP for development/debugging
             print(f"[EMAIL OTP] To: {email} | Code: {otp_code}")
             
-            # Uncomment below for production SMTP sending
-            # if hasattr(settings, 'smtp_host'):
-            #     with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
-            #         if hasattr(settings, 'smtp_username'):
-            #             server.login(settings.smtp_username, settings.smtp_password)
-            #         server.send_message(msg)
+            # Send via SMTP if enabled
+            if settings.smtp_enabled and settings.smtp_username and settings.smtp_password:
+                try:
+                    with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+                        server.starttls()  # Enable TLS
+                        server.login(settings.smtp_username, settings.smtp_password)
+                        server.send_message(msg)
+                    print(f"[EMAIL OTP] Email sent successfully to {email}")
+                except Exception as smtp_error:
+                    print(f"[EMAIL OTP] SMTP Error: {smtp_error}")
+                    # Still log to console so OTP is accessible
+            else:
+                print(f"[EMAIL OTP] SMTP disabled. Check logs for OTP code.")
             
         except Exception as e:
-            print(f"Error sending email: {e}")
+            print(f"[EMAIL OTP] Error: {e}")
             # Don't fail registration if email fails
             pass
     

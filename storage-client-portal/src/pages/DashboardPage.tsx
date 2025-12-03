@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
 import { filesAPI, FileMetadata, formatBytes } from '../lib/api';
 import { Upload, Download, Trash2, File, LogOut, HardDrive, FolderOpen, Gift } from 'lucide-react';
+import NotificationBell from '../components/NotificationBell';
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
@@ -97,13 +98,16 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-500">{user?.email}</p>
               </div>
             </div>
-            <button
-              onClick={logout}
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
+            <div className="flex items-center gap-3">
+              <NotificationBell storageUsed={storageUsed} storageQuota={storageQuota} />
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>

@@ -1,0 +1,205 @@
+================================================================================
+  🚀 HOW TO START/STOP ICTNexus Storage Services
+================================================================================
+
+AFTER LAPTOP RESTART
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Start Docker Desktop
+2. Wait for Docker to be ready (whale icon in taskbar)
+3. Run this command:
+
+   cd c:\Users\noble\Downloads\dsc\Cressencia
+   docker-compose -f docker-compose.storage.yml up -d
+
+
+START ALL SERVICES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+docker-compose -f docker-compose.storage.yml up -d
+
+This starts:
+  ✅ Database (PostgreSQL)
+  ✅ Backend API (FastAPI)
+  ✅ 3 Storage Nodes
+  ✅ Client Portal (React)
+  ✅ Admin Portal (React)
+
+
+STOP ALL SERVICES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+docker-compose -f docker-compose.storage.yml down
+
+
+RESTART ALL SERVICES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+docker-compose -f docker-compose.storage.yml restart
+
+
+CHECK STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+docker-compose -f docker-compose.storage.yml ps
+
+Shows all running containers and their status.
+
+
+RESTART SPECIFIC SERVICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Backend only:
+  docker-compose -f docker-compose.storage.yml restart storage-service
+
+Client Portal only:
+  docker-compose -f docker-compose.storage.yml restart storage-client-portal
+
+Admin Portal only:
+  docker-compose -f docker-compose.storage.yml restart storage-admin-portal
+
+Database only:
+  docker-compose -f docker-compose.storage.yml restart storage-db
+
+
+VIEW LOGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+All services:
+  docker-compose -f docker-compose.storage.yml logs
+
+Backend logs (last 50 lines):
+  docker logs storage_service --tail 50
+
+Backend logs (live/follow):
+  docker logs storage_service -f
+
+Client Portal logs:
+  docker logs storage_client_portal --tail 20
+
+Admin Portal logs:
+  docker logs storage_admin_portal --tail 20
+
+
+ACCESS URLS (After Services Start)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Client Portal:
+  http://localhost:5175
+  Login: admin@ictnexus.edu / admin
+
+Admin Portal:
+  http://localhost:5176
+  Login: admin@ictnexus.edu / admin
+
+Backend API Docs:
+  http://localhost:8085/docs
+
+Health Check:
+  http://localhost:8085/health
+
+
+WAIT TIME AFTER START
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After running "up -d", wait:
+  - Database: ~5 seconds
+  - Backend: ~10 seconds
+  - Frontend: ~15 seconds
+
+Total: Wait about 15-20 seconds before accessing portals.
+
+
+TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Service won't start?
+  1. Check Docker Desktop is running
+  2. Check logs: docker logs <service-name>
+  3. Restart service: docker-compose -f docker-compose.storage.yml restart
+
+Port already in use?
+  1. Stop other apps using ports 5175, 5176, 8085
+  2. Or restart Docker: docker-compose -f docker-compose.storage.yml down
+                        docker-compose -f docker-compose.storage.yml up -d
+
+Can't access portal?
+  1. Check service status: docker-compose -f docker-compose.storage.yml ps
+  2. Ensure status shows "Up X minutes"
+  3. Try: http://127.0.0.1:5175 instead of localhost
+  4. Clear browser cache (Ctrl + Shift + R)
+
+
+QUICK COMMANDS CHEAT SHEET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Navigate to project
+cd c:\Users\noble\Downloads\dsc\Cressencia
+
+# Start everything
+docker-compose -f docker-compose.storage.yml up -d
+
+# Check status
+docker-compose -f docker-compose.storage.yml ps
+
+# View backend logs
+docker logs storage_service --tail 50
+
+# Restart backend
+docker-compose -f docker-compose.storage.yml restart storage-service
+
+# Stop everything
+docker-compose -f docker-compose.storage.yml down
+
+# Start and view logs
+docker-compose -f docker-compose.storage.yml up
+
+
+WHAT EACH COMMAND DOES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+up -d          = Start all services in background (detached mode)
+down           = Stop and remove all containers
+restart        = Restart services without rebuilding
+ps             = Show status of all services
+logs           = View output from containers
+stop           = Stop services (keeps containers)
+start          = Start stopped services
+
+
+TYPICAL WORKFLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Daily Start:
+  1. Start Docker Desktop
+  2. cd c:\Users\noble\Downloads\dsc\Cressencia
+  3. docker-compose -f docker-compose.storage.yml up -d
+  4. Wait 20 seconds
+  5. Open http://localhost:5175
+
+Daily Stop:
+  docker-compose -f docker-compose.storage.yml down
+
+After Code Changes:
+  docker-compose -f docker-compose.storage.yml restart storage-service
+
+
+CURRENT STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ All services are running!
+
+Services Started:
+  ✅ storage_db (Database)
+  ✅ storage_service (Backend API)
+  ✅ storage_node_1 (Storage Node)
+  ✅ storage_node_2 (Storage Node)
+  ✅ storage_node_3 (Storage Node)
+  ✅ storage_client_portal (Client UI)
+  ✅ storage_admin_portal (Admin UI)
+
+You can now access:
+  → Client Portal: http://localhost:5175
+  → Admin Portal: http://localhost:5176
+
+================================================================================

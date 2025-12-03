@@ -1,0 +1,94 @@
+================================================================================
+  📧 QUICK SMTP SETUP - Where to Put Your Gmail App Password
+================================================================================
+
+OPTION 1: Create .env file (EASIEST)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Location: c:\Users\noble\Downloads\dsc\Cressencia\storage-service\.env
+
+Create this file and add:
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=youremail@gmail.com
+SMTP_PASSWORD=your-16-digit-app-password
+SMTP_FROM_EMAIL=noreply@ictnexus.edu
+SMTP_FROM_NAME=ICTNexus Storage
+SMTP_ENABLED=true
+
+Then restart:
+docker-compose -f docker-compose.storage.yml restart storage-service
+
+
+OPTION 2: Use docker-compose.storage.yml
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Add under storage-service → environment:
+
+  storage-service:
+    environment:
+      - DATABASE_URL=postgresql://storage_user:storage_pass@storage-db:5432/ictnexus_storage
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=youremail@gmail.com
+      - SMTP_PASSWORD=your-app-password
+      - SMTP_ENABLED=true
+
+
+HOW TO GET GMAIL APP PASSWORD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Go to: https://myaccount.google.com/apppasswords
+2. Enable 2-Step Verification (if not already)
+3. Create App Password for "Mail" → "Other"
+4. Copy the 16-character password (remove spaces)
+5. Paste as SMTP_PASSWORD
+
+
+CURRENT STATUS (WITHOUT SMTP CONFIGURED)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ System works WITHOUT email configuration!
+✅ OTP codes are printed to backend logs
+✅ Perfect for development and testing
+
+To get OTP from logs:
+docker logs storage_service | Select-String "EMAIL OTP"
+
+Output shows:
+[EMAIL OTP] To: user@example.com | Code: 123456
+
+
+TESTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Go to: http://localhost:5175/signup
+2. Fill form with your email
+3. Click "Continue to Verification"
+
+WITHOUT SMTP:
+  - Check logs for OTP: docker logs storage_service --tail 10
+  - Copy 6-digit code
+  - Enter in signup form
+
+WITH SMTP:
+  - Check your email inbox
+  - Copy 6-digit code from email
+  - Enter in signup form
+
+
+RECOMMENDATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For Demonstration/Testing:
+  → Keep SMTP_ENABLED=false
+  → Use logs for OTP codes
+  → No email setup needed!
+
+For Production:
+  → Configure Gmail App Password
+  → Set SMTP_ENABLED=true
+  → Real emails sent to users
+
+================================================================================

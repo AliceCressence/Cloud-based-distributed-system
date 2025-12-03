@@ -82,9 +82,21 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-sm text-gray-600 text-center mt-6">
-          Default login: admin@ictnexus.edu / admin
-        </p>
+        <div className="mt-6 space-y-3">
+          <div className="text-center text-sm">
+            <span className="text-gray-600">Don't have an account? </span>
+            <button
+              type="button"
+              onClick={() => navigate('/signup')}
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Sign up for free 2GB storage
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 text-center">
+            Default login: admin@ictnexus.edu / admin
+          </p>
+        </div>
       </div>
     </div>
   );
