@@ -3,6 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { HardDrive } from 'lucide-react';
 
+// Helper function to extract error message from API response
+const getErrorMessage = (error: any, defaultMessage: string): string => {
+  if (!error.response?.data?.detail) {
+    return error.message || defaultMessage;
+  }
+  
+  const detail = error.response.data.detail;
+  
+  // If detail is an array (validation errors), extract messages
+  if (Array.isArray(detail)) {
+    return detail.map((err: any) => err.msg || err.message).join(', ');
+  }
+  
+  // If detail is a string, use it directly
+  if (typeof detail === 'string') {
+    return detail;
+  }
+  
+  // If detail is an object, try to extract message
+  if (typeof detail === 'object') {
+    return detail.msg || detail.message || defaultMessage;
+  }
+  
+  return defaultMessage;
+};
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +46,9 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed. Please try again.');
+      const errorMessage = getErrorMessage(err, 'Login failed. Please try again.');
+      setError(errorMessage);
+      console.error('Admin login error:', err);
     } finally {
       setLoading(false);
     }

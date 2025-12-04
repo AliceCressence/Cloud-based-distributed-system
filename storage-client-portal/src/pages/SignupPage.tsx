@@ -4,6 +4,32 @@ import { useToast } from '../components/Toast';
 import { api } from '../lib/api';
 import { Upload, Mail, Lock, User, Shield } from 'lucide-react';
 
+// Helper function to extract error message from API response
+const getErrorMessage = (error: any, defaultMessage: string): string => {
+  if (!error.response?.data?.detail) {
+    return error.message || defaultMessage;
+  }
+  
+  const detail = error.response.data.detail;
+  
+  // If detail is an array (validation errors), extract messages
+  if (Array.isArray(detail)) {
+    return detail.map((err: any) => err.msg || err.message).join(', ');
+  }
+  
+  // If detail is a string, use it directly
+  if (typeof detail === 'string') {
+    return detail;
+  }
+  
+  // If detail is an object, try to extract message
+  if (typeof detail === 'object') {
+    return detail.msg || detail.message || JSON.stringify(detail);
+  }
+  
+  return defaultMessage;
+};
+
 export default function SignupPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -38,7 +64,9 @@ export default function SignupPage() {
       showToast('OTP sent to your email!', 'success');
       setStep('otp');
     } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Failed to send OTP', 'error');
+      const errorMsg = getErrorMessage(error, 'Failed to send OTP');
+      showToast(errorMsg, 'error');
+      console.error('Send OTP error:', error);
     } finally {
       setLoading(false);
     }
@@ -65,13 +93,22 @@ export default function SignupPage() {
         user_id: formData.user_id,
         email: formData.email,
         password: formData.password,
-        role: 'USER'
+        role: 'student_undergrad'
       });
 
+      // Clear any existing tokens
+      localStorage.removeItem('token');
+      
       showToast('Account created successfully! Please login.', 'success');
-      navigate('/login');
+      
+      // Delay slightly to ensure toast is visible before redirect
+      setTimeout(() => {
+        navigate('/login');
+      }, 1000);
     } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Failed to create account', 'error');
+      const errorMsg = getErrorMessage(error, 'Failed to create account');
+      showToast(errorMsg, 'error');
+      console.error('Account creation error:', error);
     } finally {
       setLoading(false);
     }
@@ -83,7 +120,9 @@ export default function SignupPage() {
       await api.post('/verify/resend-otp', { email: formData.email });
       showToast('New OTP sent to your email!', 'success');
     } catch (error: any) {
-      showToast(error.response?.data?.detail || 'Failed to resend OTP', 'error');
+      const errorMsg = getErrorMessage(error, 'Failed to resend OTP');
+      showToast(errorMsg, 'error');
+      console.error('Resend OTP error:', error);
     } finally {
       setLoading(false);
     }

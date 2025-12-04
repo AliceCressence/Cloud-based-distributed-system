@@ -24,7 +24,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (token) {
       try {
         const userData = await authAPI.getMe();
-        setUser(userData);
+        
+        // Verify user is ADMIN
+        if (userData.role !== 'admin') {
+          localStorage.removeItem('token');
+          setUser(null);
+        } else {
+          setUser(userData);
+        }
       } catch (error) {
         localStorage.removeItem('token');
       }
@@ -36,6 +43,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await authAPI.login(email, password);
     localStorage.setItem('token', response.access_token);
     const userData = await authAPI.getMe();
+    
+    // Check if user is ADMIN
+    if (userData.role !== 'admin') {
+      localStorage.removeItem('token');
+      throw new Error('Access denied. Admin privileges required.');
+    }
+    
     setUser(userData);
   };
 

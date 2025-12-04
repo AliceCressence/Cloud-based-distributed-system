@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     
     # Storage Configuration
     chunk_size_mb: int = 2
-    default_student_quota_gb: int = 2
-    default_grad_quota_gb: int = 5
-    default_faculty_quota_gb: int = 10
+    default_student_quota_gb: int = 10
+    default_grad_quota_gb: int = 20
+    default_faculty_quota_gb: int = 50
     replication_factor: int = 2
     storage_nodes: str = "localhost:50051,localhost:50052,localhost:50053"
     

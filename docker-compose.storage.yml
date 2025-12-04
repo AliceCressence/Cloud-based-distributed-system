@@ -52,8 +52,8 @@ services:
     environment:
       NODE_ID: node1
       NODE_PORT: 50051
-      CAPACITY_GB: 5
-    command: ["python", "node.py", "--node-id", "node1", "--port", "50051", "--capacity-gb", "5"]
+      CAPACITY_GB: 30
+    command: ["python", "node.py", "--node-id", "node1", "--port", "50051", "--capacity-gb", "30"]
     networks:
       - ums-net
     volumes:
@@ -68,8 +68,8 @@ services:
     environment:
       NODE_ID: node2
       NODE_PORT: 50052
-      CAPACITY_GB: 5
-    command: ["python", "node.py", "--node-id", "node2", "--port", "50052", "--capacity-gb", "5"]
+      CAPACITY_GB: 30
+    command: ["python", "node.py", "--node-id", "node2", "--port", "50052", "--capacity-gb", "30"]
     networks:
       - ums-net
     volumes:
@@ -84,8 +84,8 @@ services:
     environment:
       NODE_ID: node3
       NODE_PORT: 50053
-      CAPACITY_GB: 5
-    command: ["python", "node.py", "--node-id", "node3", "--port", "50053", "--capacity-gb", "5"]
+      CAPACITY_GB: 30
+    command: ["python", "node.py", "--node-id", "node3", "--port", "50053", "--capacity-gb", "30"]
     networks:
       - ums-net
     volumes:

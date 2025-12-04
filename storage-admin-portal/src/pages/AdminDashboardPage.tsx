@@ -5,8 +5,10 @@ import { api, formatBytes } from '../lib/api';
 import { 
   LogOut, Server, Users, HardDrive,
   Plus, Trash2, Power, RefreshCw, Database,
-  TrendingUp, CheckCircle, XCircle
+  TrendingUp, CheckCircle, XCircle, Info
 } from 'lucide-react';
+import NodeDetailsModal from '../components/NodeDetailsModal';
+import SystemTopology from '../components/SystemTopology';
 
 interface User {
   id: number;
@@ -73,6 +75,13 @@ export default function AdminDashboardPage() {
     port: 50054,
     capacity_bytes: 5368709120 // 5GB
   });
+  const [selectedNode, setSelectedNode] = useState<StorageNode | null>(null);
+  const [nodeDetailsOpen, setNodeDetailsOpen] = useState(false);
+
+  const handleNodeClick = (node: StorageNode) => {
+    setSelectedNode(node);
+    setNodeDetailsOpen(true);
+  };
 
   useEffect(() => {
     loadDashboardData();
@@ -407,6 +416,14 @@ export default function AdminDashboardPage() {
                   
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => handleNodeClick(node)}
+                      className="px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                      title="View Details"
+                    >
+                      <Info className="w-4 h-4" />
+                      Details
+                    </button>
+                    <button
                       onClick={() => handleToggleNodeStatus(node.node_id, node.status)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title={node.status === 'online' ? 'Stop' : 'Start'}
@@ -432,6 +449,11 @@ export default function AdminDashboardPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* System Topology Visualization */}
+        <div className="mb-8">
+          <SystemTopology nodes={nodes} onNodeClick={handleNodeClick} />
         </div>
 
         {/* Users Section */}
@@ -487,6 +509,16 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Node Details Modal */}
+      <NodeDetailsModal
+        isOpen={nodeDetailsOpen}
+        onClose={() => {
+          setNodeDetailsOpen(false);
+          setSelectedNode(null);
+        }}
+        node={selectedNode}
+      />
     </div>
   );
 }

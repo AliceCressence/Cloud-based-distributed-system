@@ -97,15 +97,16 @@ CREATE INDEX IF NOT EXISTS idx_timestamp ON storage_stats(timestamp);
 
 -- Create admin user (password: admin)
 -- Password hash is bcrypt hash of "admin"
--- Quota: 2GB (2147483648 bytes)
+-- Quota: 10GB (10737418240 bytes)
 INSERT INTO users (user_id, email, password_hash, role, storage_quota_bytes, storage_used_bytes, is_active)
-VALUES ('admin', 'admin@ictnexus.edu', '$2b$12$OkUAx2ma1IN8GIvw367lu.yNpLyReys15FczyE.2R0bkhW9MgYIoW', 'ADMIN', 2147483648, 0, TRUE)
+VALUES ('admin', 'admin@ictnexus.edu', '$2b$12$OkUAx2ma1IN8GIvw367lu.yNpLyReys15FczyE.2R0bkhW9MgYIoW', 'ADMIN', 10737418240, 0, TRUE)
 ON CONFLICT (user_id) DO NOTHING;
 
 -- Sample storage nodes (for testing)
+-- Each node: 30GB capacity (32212254720 bytes)
 INSERT INTO storage_nodes (node_id, host, port, capacity_bytes, used_bytes, status)
 VALUES 
-    ('node1', 'localhost', 50051, 5368709120, 0, 'online'),
-    ('node2', 'localhost', 50052, 5368709120, 0, 'online'),
-    ('node3', 'localhost', 50053, 5368709120, 0, 'online')
+    ('node1', 'localhost', 50051, 32212254720, 0, 'online'),
+    ('node2', 'localhost', 50052, 32212254720, 0, 'online'),
+    ('node3', 'localhost', 50053, 32212254720, 0, 'online')
 ON CONFLICT (node_id) DO NOTHING;
