@@ -8,6 +8,7 @@ from ..models import File, FileChunk, User, StorageNode, FileStatus, NodeStatus
 from ..schemas import FileMetadata, FileListResponse, ChunkMetadata, FileChunkMap
 from ..storage_client import storage_client, chunk_file, calculate_checksum
 from ..config import get_settings
+from ..queue import safe_publish_event
 
 settings = get_settings()
 
@@ -71,8 +72,11 @@ class FileService:
             chunk_id = f"{file_id}-chunk-{idx}"
             chunk_checksum = calculate_checksum(chunk_data)
             
-            # Select node (round-robin)
-            node = nodes[idx % len(nodes)]
+            # Select node by highest free capacity ratio (prefer least utilized)
+            candidates = [n for n in nodes if (n.capacity_bytes - n.used_bytes) >= len(chunk_data)]
+            if not candidates:
+                raise HTTPException(status_code=503, detail="Insufficient storage capacity across nodes")
+            node = min(candidates, key=lambda n: (n.used_bytes / n.capacity_bytes) if n.capacity_bytes else 1.0)
             
             # Store chunk on node
             result = await storage_client.store_chunk(
@@ -100,10 +104,17 @@ class FileService:
                 # Update node usage
                 node.used_bytes += len(chunk_data)
                 
-                # Replicate chunk if configured
+                # Replicate chunk if configured (choose next best candidate)
                 if settings.replication_factor > 1:
-                    replica_node = nodes[(idx + 1) % len(nodes)]
-                    if replica_node.id != node.id:
+                    replica_candidates = [
+                        n for n in nodes
+                        if n.id != node.id and (n.capacity_bytes - n.used_bytes) >= len(chunk_data)
+                    ]
+                    if replica_candidates:
+                        replica_node = min(
+                            replica_candidates,
+                            key=lambda n: (n.used_bytes / n.capacity_bytes) if n.capacity_bytes else 1.0
+                        )
                         replica_chunk_id = f"{chunk_id}-replica"
                         await storage_client.store_chunk(
                             chunk_id=replica_chunk_id,
@@ -114,7 +125,7 @@ class FileService:
                             node_host=replica_node.host,
                             node_port=replica_node.port
                         )
-                        
+
                         # Create replica chunk record
                         replica_chunk = FileChunk(
                             chunk_id=replica_chunk_id,
@@ -137,7 +148,27 @@ class FileService:
         
         db.commit()
         db.refresh(db_file)
-        
+
+        # Publish upload completion event (best-effort)
+        try:
+            safe_publish_event(
+                queue_name="uploads",
+                payload={
+                    "id": str(uuid.uuid4()),
+                    "type": "STORAGE_UPLOAD_COMPLETED",
+                    "file_id": file_id,
+                    "db_file_id": db_file.id,
+                    "user_id": user.user_id,
+                    "original_size": file_size,
+                    "chunk_count": len(chunks),
+                    "replication_factor": settings.replication_factor,
+                    "created_at": datetime.utcnow().isoformat() + "Z",
+                },
+            )
+        except Exception:
+            # Do not fail the upload if queue is unavailable
+            pass
+
         return db_file
     
     @staticmethod

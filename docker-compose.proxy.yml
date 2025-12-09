@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  reverse-proxy:
+    image: nginx:1.27
+    container_name: storage_nginx
+    volumes:
+      - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+      # Enable TLS by adding 443 and certs in nginx.conf
+      # - "443:443"
+    depends_on:
+      - storage-service
+      - storage-client-portal
+      - storage-admin-portal
+    networks:
+      - ums-net
+
+networks:
+  ums-net:
+    # Inherit from base compose
+    external: false

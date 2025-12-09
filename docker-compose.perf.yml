@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  storage-service:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8085", "--workers", "4", "--no-server-header"]
+    environment:
+      DB_POOL_SIZE: 20
+      DB_MAX_OVERFLOW: 40
+      DB_POOL_TIMEOUT: 30
+      DB_POOL_RECYCLE: 1800
+      DB_POOL_PRE_PING: "true"
+
+  # optional: increase worker threads for gRPC nodes (if implemented)
+  # storage-node-1:
+  #   environment:
+  #     GRPC_THREAD_POOL: 20
+  # storage-node-2:
+  #   environment:
+  #     GRPC_THREAD_POOL: 20
+  # storage-node-3:
+  #   environment:
+  #     GRPC_THREAD_POOL: 20

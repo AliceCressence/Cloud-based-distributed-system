@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
+from pathlib import Path
 from jose import JWTError, jwt
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -10,6 +11,19 @@ from .models import User
 from .config import get_settings
 
 settings = get_settings()
+_JWT_PRIV = None
+_JWT_PUB = None
+if settings.algorithm.upper() == "RS256":
+    if settings.jwt_private_key_path:
+        try:
+            _JWT_PRIV = Path(settings.jwt_private_key_path).read_text()
+        except Exception:
+            _JWT_PRIV = None
+    if settings.jwt_public_key_path:
+        try:
+            _JWT_PUB = Path(settings.jwt_public_key_path).read_text()
+        except Exception:
+            _JWT_PUB = None
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
@@ -29,13 +43,15 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+    key = _JWT_PRIV if settings.algorithm.upper() == "RS256" and _JWT_PRIV else settings.secret_key
+    encoded_jwt = jwt.encode(to_encode, key, algorithm=settings.algorithm)
     return encoded_jwt
 
 
 def decode_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        key = _JWT_PUB if settings.algorithm.upper() == "RS256" and _JWT_PUB else settings.secret_key
+        payload = jwt.decode(token, key, algorithms=[settings.algorithm])
         return payload
     except JWTError:
         raise HTTPException(

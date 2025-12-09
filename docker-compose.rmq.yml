@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: storage_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672" # management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - ums-net
+
+  # Optional worker consuming events (uploads queue)
+  storage-worker:
+    build: ./storage-service
+    container_name: storage_worker
+    command: ["python", "-m", "app.worker"]
+    environment:
+      DATABASE_URL: postgresql://storage_user:storage_pass@storage-db:5432/ictnexus_storage
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+      - storage-db
+    networks:
+      - ums-net
+
+  # Override storage-service to publish to RabbitMQ inside the network
+  storage-service:
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+
+networks:
+  ums-net:
+    # merged from base compose
+    external: false

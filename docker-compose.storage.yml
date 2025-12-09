@@ -98,7 +98,7 @@ services:
     ports:
       - "5175:5173"
     environment:
-      VITE_API_URL: http://localhost:8085/api/v1
+      VITE_API_URL: http://${PUBLIC_HOST:-localhost}:8085/api/v1
     networks:
       - ums-net
     volumes:
@@ -112,7 +112,7 @@ services:
     ports:
       - "5176:5173"
     environment:
-      VITE_API_URL: http://localhost:8085/api/v1
+      VITE_API_URL: http://${PUBLIC_HOST:-localhost}:8085/api/v1
     networks:
       - ums-net
     volumes:
